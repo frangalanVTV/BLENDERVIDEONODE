@@ -97,15 +97,20 @@ export function ControlCluster({ onShuffle, nextHref }: ControlClusterProps) {
       persist({ x: rect.left, y: rect.top });
     } else if (drag?.pressedAction === "shuffle") {
       onShuffle();
+    } else if (drag?.pressedAction === "next") {
+      window.location.href = nextHref;
     }
-    // The "next" tap needs no handling here — its own <a href> navigates
-    // natively unless handleLinkClick below cancels it for a real drag.
   };
 
+  // setPointerCapture on the container (needed so dragging tracks correctly
+  // past the icons' edges) retargets the eventual click to the container
+  // too, in Chrome and Safari alike — the <a> below never sees a "real"
+  // click, so its native navigation silently never fires. Navigation is
+  // therefore handled entirely above, in handlePointerUp; this only ever
+  // suppresses the native click so it can't double-navigate on the rare
+  // browser where the click *does* still reach the anchor.
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (dragRef.current?.moved) {
-      e.preventDefault();
-    }
+    e.preventDefault();
   };
 
   const positioned = position !== null;
