@@ -1,0 +1,31 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #000;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Bottom-right on desktop, bottom-center on phone-width viewports.
+   Positioning needs a real media query, which inline styles can't express. */
+.shuffle-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  left: auto;
+  transform: none;
+}
+
+@media (max-width: 640px) {
+  .shuffle-button {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
