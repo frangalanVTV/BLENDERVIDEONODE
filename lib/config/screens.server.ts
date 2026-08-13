@@ -3,13 +3,14 @@ import fs from "node:fs";
 import path from "node:path";
 import type { ScreensConfig } from "../geometry/types";
 
-const SCREENS_PATH = path.join(process.cwd(), "data", "screens.json");
+const DATA_DIR = path.join(process.cwd(), "data");
 
-export function readScreens(): ScreensConfig {
-  const raw = fs.readFileSync(SCREENS_PATH, "utf-8");
+/** filename without extension, e.g. "screens" or "screens2" — one file per view's calibration. */
+export function readScreens(name: string = "screens"): ScreensConfig {
+  const raw = fs.readFileSync(path.join(DATA_DIR, `${name}.json`), "utf-8");
   return JSON.parse(raw) as ScreensConfig;
 }
 
-export function writeScreens(screens: ScreensConfig): void {
-  fs.writeFileSync(SCREENS_PATH, JSON.stringify(screens, null, 2) + "\n", "utf-8");
+export function writeScreens(name: string, screens: ScreensConfig): void {
+  fs.writeFileSync(path.join(DATA_DIR, `${name}.json`), JSON.stringify(screens, null, 2) + "\n", "utf-8");
 }

@@ -33,6 +33,7 @@ next-env.d.ts
 
 # Personal reference material, not used by the app
 /capturas/
+/REFERENCIAS/
 
 # Logs
 npm-debug.log*

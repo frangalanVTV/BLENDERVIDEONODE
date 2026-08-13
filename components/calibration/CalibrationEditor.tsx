@@ -8,6 +8,11 @@ import { CalibrationOverlay } from "./CalibrationOverlay";
 import { ScreenPicker } from "./ScreenPicker";
 
 interface CalibrationEditorProps {
+  renderSrc: string;
+  frontSrc: string;
+  /** e.g. "screens" or "screens2" — matches the data/<dataFile>.json this view calibrates and /api/screens/<dataFile>. */
+  dataFile: string;
+  viewLabel: string;
   initialScreens: ScreensConfig;
   videoPools: VideoPool[];
 }
@@ -15,16 +20,17 @@ interface CalibrationEditorProps {
 type SaveState = "idle" | "saving" | "saved" | "error";
 
 /**
- * Calibration mode: drag each screen's 4 corners over the render until the
- * live video preview matches the physical screen, tick "OK" to hide that
- * screen's handles, then "Guardar" to persist all corners to data/screens.json.
+ * Calibration mode for one view: drag each screen's 4 corners over that
+ * view's render until the live video preview matches the physical screen,
+ * tick "OK" to hide that screen's handles, then "Guardar" to persist all
+ * corners to data/<dataFile>.json.
  *
- * Persistence writes to the local filesystem via /api/screens, which only
- * works when running `npm run dev` on your machine (Vercel's serverless
- * filesystem is read-only) — calibrate locally, commit the resulting
- * screens.json, then deploy.
+ * Persistence writes to the local filesystem via /api/screens/<dataFile>,
+ * which only works when running `npm run dev` on your machine (Vercel's
+ * serverless filesystem is read-only) — calibrate locally, commit the
+ * resulting JSON, then deploy.
  */
-export function CalibrationEditor({ initialScreens, videoPools }: CalibrationEditorProps) {
+export function CalibrationEditor({ renderSrc, frontSrc, dataFile, viewLabel, initialScreens, videoPools }: CalibrationEditorProps) {
   const [screens, setScreens] = useState(initialScreens);
   const [activeScreenId, setActiveScreenId] = useState(initialScreens[0]?.id ?? "");
   const [confirmed, setConfirmed] = useState<Record<string, boolean>>({});
@@ -75,7 +81,7 @@ export function CalibrationEditor({ initialScreens, videoPools }: CalibrationEdi
   const save = useCallback(async () => {
     setSaveState("saving");
     try {
-      const res = await fetch("/api/screens", {
+      const res = await fetch(`/api/screens/${dataFile}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(screens),
@@ -84,12 +90,12 @@ export function CalibrationEditor({ initialScreens, videoPools }: CalibrationEdi
     } catch {
       setSaveState("error");
     }
-  }, [screens]);
+  }, [screens, dataFile]);
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "#000", display: "flex" }}>
       <div style={{ flex: 1, position: "relative" }}>
-        <RenderStage frontLayerZIndex={0}>
+        <RenderStage renderSrc={renderSrc} frontSrc={frontSrc} frontLayerZIndex={0}>
           {(width, height) => (
             <>
               {screens.filter((screen) => screen.visible).map((screen) => (
@@ -111,7 +117,7 @@ export function CalibrationEditor({ initialScreens, videoPools }: CalibrationEdi
       </div>
 
       <div style={{ width: 280, padding: 16, background: "#0a0a0a", color: "#fff", borderLeft: "1px solid #222", overflowY: "auto" }}>
-        <h1 style={{ fontSize: 14, marginBottom: 4 }}>Calibración de pantallas</h1>
+        <h1 style={{ fontSize: 14, marginBottom: 4 }}>Calibración — {viewLabel}</h1>
         <p style={{ fontSize: 11, color: "#888", marginBottom: 12, lineHeight: 1.4 }}>
           Arrastrá el video para moverlo entero, o un punto verde para ajustar solo esa esquina.
         </p>
@@ -139,7 +145,7 @@ export function CalibrationEditor({ initialScreens, videoPools }: CalibrationEdi
         >
           {saveState === "saving" ? "Guardando..." : "Guardar calibración"}
         </button>
-        {saveState === "saved" && <p style={{ fontSize: 12, color: "#22c55e", marginTop: 8 }}>Guardado en data/screens.json</p>}
+        {saveState === "saved" && <p style={{ fontSize: 12, color: "#22c55e", marginTop: 8 }}>Guardado en data/{dataFile}.json</p>}
         {saveState === "error" && <p style={{ fontSize: 12, color: "#ef4444", marginTop: 8 }}>Error al guardar</p>}
       </div>
     </div>

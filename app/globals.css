@@ -12,9 +12,22 @@ body {
   box-sizing: border-box;
 }
 
-/* Bottom-right on desktop, bottom-center on phone-width viewports.
-   Positioning needs a real media query, which inline styles can't express. */
+/* Default (undragged) positions for the two floating buttons. Both are
+   135px; 12px gap between them. next-view-button sits in the actual
+   bottom-right corner, shuffle-button just to its left — on phone widths
+   the pair is centered as a group instead of pinned to a corner.
+   Positioning needs a real media query, which inline styles can't express;
+   once a button is dragged it switches to explicit inline left/top and
+   stops using these classes entirely. */
 .shuffle-button {
+  position: fixed;
+  bottom: 24px;
+  right: 171px; /* 24 + 135 (next-view-button) + 12 (gap) */
+  left: auto;
+  transform: none;
+}
+
+.next-view-button {
   position: fixed;
   bottom: 24px;
   right: 24px;
@@ -25,7 +38,13 @@ body {
 @media (max-width: 640px) {
   .shuffle-button {
     right: auto;
-    left: 50%;
-    transform: translateX(-50%);
+    left: calc(50% - 141px); /* -135px width - 6px half-gap, so the pair centers as a group */
+    transform: none;
+  }
+
+  .next-view-button {
+    right: auto;
+    left: calc(50% + 6px);
+    transform: none;
   }
 }

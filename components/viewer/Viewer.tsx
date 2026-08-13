@@ -7,14 +7,19 @@ import { assignVideoGroups } from "@/lib/video-assignment/shuffle";
 import { RenderStage } from "../render-viewer/RenderStage";
 import { ScreenStack } from "../screen-overlay/ScreenStack";
 import { ShuffleButton } from "../controls/ShuffleButton";
+import { NextViewButton } from "../controls/NextViewButton";
 
 interface ViewerProps {
+  renderSrc: string;
+  frontSrc: string;
+  /** Where the "next view" button sends you — the other view in a 2-view loop, or the next one in sequence once there are more. */
+  nextHref: string;
   screens: ScreensConfig;
   videoPools: VideoPool[];
 }
 
-/** Production viewer: static render + all screens playing, with a single button to reshuffle every screen's video at once. */
-export function Viewer({ screens, videoPools }: ViewerProps) {
+/** Production viewer: static render + all screens playing, a button to reshuffle every screen's video, and a button to jump to the next view. */
+export function Viewer({ renderSrc, frontSrc, nextHref, screens, videoPools }: ViewerProps) {
   // The shuffle runs over ALL 8 screens, visible or not — a hidden screen
   // still "holds" one of the 8 video slots, it's just never drawn. That
   // keeps the 8-videos-for-8-screens accounting intact even though only 7
@@ -47,13 +52,14 @@ export function Viewer({ screens, videoPools }: ViewerProps) {
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "#000" }}>
-      <RenderStage>
+      <RenderStage renderSrc={renderSrc} frontSrc={frontSrc}>
         {(width, height) => (
           <ScreenStack screens={visibleScreens} containerWidth={width} containerHeight={height} getVideoSrc={getVideoSrc} />
         )}
       </RenderStage>
 
       <ShuffleButton onClick={shuffle} />
+      <NextViewButton href={nextHref} />
     </div>
   );
 }
