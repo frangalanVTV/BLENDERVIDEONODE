@@ -12,22 +12,14 @@ body {
   box-sizing: border-box;
 }
 
-/* Default (undragged) positions for the two floating buttons. Both are
-   135px; 12px gap between them. next-view-button sits in the actual
-   bottom-right corner, shuffle-button just to its left — on phone widths
-   the pair is centered as a group instead of pinned to a corner.
+/* Default (undragged) position for the shuffle+next control cluster: bottom-right
+   on desktop, bottom-center on phone widths. It's a single flex element now
+   (shuffle and next laid out with a fixed internal gap), so centering it is
+   just centering one box — no per-button pixel math to keep in sync.
    Positioning needs a real media query, which inline styles can't express;
-   once a button is dragged it switches to explicit inline left/top and
-   stops using these classes entirely. */
-.shuffle-button {
-  position: fixed;
-  bottom: 24px;
-  right: 171px; /* 24 + 135 (next-view-button) + 12 (gap) */
-  left: auto;
-  transform: none;
-}
-
-.next-view-button {
+   once the cluster is dragged it switches to explicit inline left/top and
+   stops using this class entirely. */
+.control-cluster {
   position: fixed;
   bottom: 24px;
   right: 24px;
@@ -36,15 +28,9 @@ body {
 }
 
 @media (max-width: 640px) {
-  .shuffle-button {
+  .control-cluster {
     right: auto;
-    left: calc(50% - 141px); /* -135px width - 6px half-gap, so the pair centers as a group */
-    transform: none;
-  }
-
-  .next-view-button {
-    right: auto;
-    left: calc(50% + 6px);
-    transform: none;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }

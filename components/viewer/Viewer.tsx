@@ -6,8 +6,7 @@ import type { VideoPool } from "@/lib/video-assignment/getVideoPools.server";
 import { assignVideoGroups } from "@/lib/video-assignment/shuffle";
 import { RenderStage } from "../render-viewer/RenderStage";
 import { ScreenStack } from "../screen-overlay/ScreenStack";
-import { ShuffleButton } from "../controls/ShuffleButton";
-import { NextViewButton } from "../controls/NextViewButton";
+import { ControlCluster } from "../controls/ControlCluster";
 
 interface ViewerProps {
   renderSrc: string;
@@ -58,8 +57,7 @@ export function Viewer({ renderSrc, frontSrc, nextHref, screens, videoPools }: V
         )}
       </RenderStage>
 
-      <ShuffleButton onClick={shuffle} />
-      <NextViewButton href={nextHref} />
+      <ControlCluster onShuffle={shuffle} nextHref={nextHref} />
     </div>
   );
 }
